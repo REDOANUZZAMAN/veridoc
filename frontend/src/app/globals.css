@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Neutral ramp tuned for long sessions on dense tables: cool, low-chroma,
+       high separation between surface levels. */
+    --background: 210 20% 98%;
+    --foreground: 222 30% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 30% 12%;
+    --primary: 214 76% 34%;
+    --primary-foreground: 210 40% 99%;
+    --secondary: 214 24% 94%;
+    --secondary-foreground: 222 28% 20%;
+    --muted: 214 20% 95%;
+    --muted-foreground: 215 16% 42%;
+    --accent: 214 30% 93%;
+    --accent-foreground: 222 30% 16%;
+    --destructive: 0 68% 44%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 20% 88%;
+    --input: 214 20% 86%;
+    --ring: 214 76% 44%;
+    --radius: 0.5rem;
+
+    --sidebar: 219 40% 13%;
+    --sidebar-foreground: 213 28% 88%;
+    --sidebar-muted: 214 16% 62%;
+    --sidebar-active: 214 70% 52%;
+
+    /* The only three colours that carry meaning in this product. */
+    --risk-low: 168 62% 30%;
+    --risk-review: 33 88% 38%;
+    --risk-high: 357 68% 44%;
+  }
+
+  .dark {
+    --background: 220 28% 9%;
+    --foreground: 210 24% 93%;
+    --card: 220 26% 12%;
+    --card-foreground: 210 24% 93%;
+    --popover: 220 26% 12%;
+    --popover-foreground: 210 24% 93%;
+    --primary: 213 80% 60%;
+    --primary-foreground: 220 30% 10%;
+    --secondary: 219 20% 19%;
+    --secondary-foreground: 210 24% 92%;
+    --muted: 219 18% 17%;
+    --muted-foreground: 215 16% 64%;
+    --accent: 219 20% 21%;
+    --accent-foreground: 210 24% 94%;
+    --destructive: 0 62% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 219 16% 22%;
+    --input: 219 16% 26%;
+    --ring: 213 80% 58%;
+
+    --sidebar: 221 34% 10%;
+    --sidebar-foreground: 213 26% 86%;
+    --sidebar-muted: 215 14% 58%;
+    --sidebar-active: 213 78% 58%;
+
+    --risk-low: 166 52% 46%;
+    --risk-review: 35 82% 56%;
+    --risk-high: 356 72% 60%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+  }
+
+  /* Tabular figures everywhere numbers are compared down a column. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-lg border bg-card shadow-sm;
+  }
+
+  .panel-header {
+    @apply flex items-center justify-between gap-3 border-b px-4 py-3;
+  }
+
+  .data-grid {
+    @apply w-full border-separate border-spacing-0 text-sm;
+  }
+
+  .data-grid th {
+    @apply sticky top-0 z-10 whitespace-nowrap border-b bg-muted/70 px-3 py-2 text-left
+      text-2xs font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur;
+  }
+
+  .data-grid td {
+    @apply border-b px-3 py-2.5 align-middle;
+  }
+
+  .data-grid tbody tr:hover {
+    @apply bg-accent/40;
+  }
+
+  /* Evidence highlight drawn over a page render. */
+  .evidence-region {
+    @apply pointer-events-auto absolute cursor-pointer rounded-[2px] border-2 transition-all;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0);
+  }
+
+  .evidence-region[data-active="true"] {
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.35);
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-border;
+  }
+}

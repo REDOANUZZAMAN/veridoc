@@ -1,0 +1,25 @@
+# Lint configuration. Line length is 100 to match the code's own wrapping.
+line-length = 100
+target-version = "py312"
+exclude = ["alembic/versions"]
+
+[lint]
+select = ["E", "F", "I", "B", "UP", "W"]
+ignore = [
+    "E501",   # line length is enforced by the formatter, not the linter
+    "B008",   # FastAPI's Depends()/Query() in defaults is the framework idiom
+    "UP017",  # `timezone.utc` reads more explicitly than `datetime.UTC`
+    "UP046",  # PEP 695 generics interact badly with Pydantic generic models
+]
+
+[lint.per-file-ignores]
+# Model and seed modules import for side effects (metadata registration).
+"app/db/models/__init__.py" = ["F401"]
+"app/db/seed.py" = ["F401"]
+"alembic/env.py" = ["F401"]
+"tests/conftest.py" = ["E402"]  # env must be set before app modules import
+# The walkthrough script inserts the backend on sys.path before importing app.
+"scripts/walkthrough.py" = ["E402"]
+
+[lint.isort]
+known-first-party = ["app", "tests"]

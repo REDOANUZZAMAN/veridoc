@@ -1,0 +1,117 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { FileSearch, GitCompareArrows, ScanEye, ShieldCheck } from "lucide-react";
+
+import { LoginForm } from "@/app/login/login-form";
+import { APP_NAME, DEMO_MODE } from "@/lib/config";
+import { getSessionUser } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Sign in" };
+
+const CAPABILITIES = [
+  {
+    icon: ScanEye,
+    title: "Forensic measurement",
+    body: "PDF object structure, metadata provenance, typography, and pixel-level analysis of embedded rasters.",
+  },
+  {
+    icon: GitCompareArrows,
+    title: "Consistency & cross-document checks",
+    body: "Deterministic rules over extracted fields, and field-by-field comparison across a claim bundle.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Trusted-source verification",
+    body: "Policy, provider, invoice, identity, vehicle and settlement lookups — each labelled with its data source.",
+  },
+  {
+    icon: FileSearch,
+    title: "Human adjudication",
+    body: "Every machine finding is confirmed or dismissed by a named reviewer, with a written reason, before a claim decision.",
+  },
+];
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const user = await getSessionUser();
+  if (user) redirect("/dashboard");
+  const { next } = await searchParams;
+
+  return (
+    <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
+      {/* Product context, not marketing. */}
+      <section className="relative hidden flex-col justify-between bg-sidebar p-10 text-sidebar-foreground lg:flex">
+        <div className="flex items-center gap-2.5">
+          <span className="inline-flex size-9 items-center justify-center rounded-md bg-sidebar-active/15 text-sidebar-active">
+            <ShieldCheck className="size-5" />
+          </span>
+          <div>
+            <p className="text-sm font-semibold text-white">{APP_NAME}</p>
+            <p className="text-2xs text-sidebar-muted">Insurance Document Intelligence</p>
+          </div>
+        </div>
+
+        <div className="max-w-xl space-y-7">
+          <div className="space-y-3">
+            <h2 className="text-2xl font-semibold leading-snug text-white">
+              Evidence for a human decision — not a verdict from a machine.
+            </h2>
+            <p className="text-sm leading-relaxed text-sidebar-foreground/80">
+              The platform combines forensic, OCR, rule-based, cross-document and trusted-source
+              signals into one explainable record. It never concludes that a document is genuine or
+              fraudulent; it ranks documents for attention and shows exactly why.
+            </p>
+          </div>
+
+          <dl className="space-y-4">
+            {CAPABILITIES.map((capability) => {
+              const Icon = capability.icon;
+              return (
+                <div key={capability.title} className="flex gap-3">
+                  <Icon className="mt-0.5 size-4 shrink-0 text-sidebar-active" />
+                  <div className="space-y-0.5">
+                    <dt className="text-xs font-semibold text-white">{capability.title}</dt>
+                    <dd className="text-2xs leading-relaxed text-sidebar-foreground/70">
+                      {capability.body}
+                    </dd>
+                  </div>
+                </div>
+              );
+            })}
+          </dl>
+        </div>
+
+        <p className="max-w-xl text-2xs leading-relaxed text-sidebar-muted">
+          Documents processed here contain medical and identity data. Access is role-scoped, every
+          action is written to an append-only audit trail, and document bodies are never written to
+          application logs.
+        </p>
+      </section>
+
+      <section className="flex items-center justify-center px-5 py-12">
+        <div className="w-full max-w-sm space-y-6">
+          <div className="space-y-1.5 lg:hidden">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex size-8 items-center justify-center rounded-md bg-primary/12 text-primary">
+                <ShieldCheck className="size-4" />
+              </span>
+              <p className="text-sm font-semibold">{APP_NAME}</p>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <h1 className="text-xl font-semibold tracking-tight">Sign in</h1>
+            <p className="text-xs text-muted-foreground">
+              Use your investigator, claims or administrator account.
+            </p>
+          </div>
+
+          <LoginForm nextPath={next} demoMode={DEMO_MODE} />
+        </div>
+      </section>
+    </div>
+  );
+}
