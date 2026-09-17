@@ -34,7 +34,8 @@ human investigator.
 
 ## Quick start
 
-Two commands, assuming Docker with Compose v2:
+Two commands, assuming Docker with Compose v2. (Deploying to a server with dokploy? See
+[`docs/DOKPLOY.md`](docs/DOKPLOY.md) and use `docker-compose.dokploy.yml`.)
 
 ```bash
 cp .env.example .env            # then edit JWT_SECRET at minimum
@@ -440,6 +441,7 @@ See [`docs/SECURITY.md`](docs/SECURITY.md) for the threat model and the encrypti
 | [`docs/DETECTION.md`](docs/DETECTION.md) | Every detector: what it measures, what it cannot tell you, and its benign explanations |
 | [`docs/API.md`](docs/API.md) | Endpoint reference with request/response examples |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Production deployment, scaling, backups, Supabase notes |
+| [`docs/DOKPLOY.md`](docs/DOKPLOY.md) | Deploying on dokploy/Traefik: DNS, compose app, first-run steps |
 | [`docs/SECURITY.md`](docs/SECURITY.md) | Threat model, controls, privacy and retention |
 | [`docs/WALKTHROUGH.md`](docs/WALKTHROUGH.md) | The twenty product requirements, demonstrated against a live instance |
 

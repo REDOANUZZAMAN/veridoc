@@ -1,0 +1,179 @@
+# ============================================================================
+# VeriDoc — production stack for dokploy / Traefik on this host
+#
+# Differences from the development docker-compose.yml:
+#   * no host ports are published — Traefik reaches the console over
+#     dokploy-network, so nothing collides with the services already on this box
+#   * the API has NO public route: the console talks to it over the internal
+#     network only, server-side. Nothing can reach /api from the internet, which
+#     is the main reason the token lives in an httpOnly cookie behind a proxy
+#   * demo mode off, and the seeder is never run (SEED_ON_START is not set)
+#   * required secrets use ${VAR:?...} so a missing value fails the deploy
+#     loudly instead of silently booting with a default
+#
+# Required environment (set these in dokploy → Environment):
+#   APP_DOMAIN          veridoc.rmaikr.top
+#   JWT_SECRET          openssl rand -hex 48
+#   POSTGRES_PASSWORD   openssl rand -hex 24
+# ============================================================================
+name: veridoc
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-veridoc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-veridoc}
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks: [veridoc-internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-veridoc} -d ${POSTGRES_DB:-veridoc}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1"]
+    volumes:
+      - redis-data:/data
+    networks: [veridoc-internal]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-pypi.org}
+    # The entrypoint waits for PostgreSQL and applies migrations before serving.
+    entrypoint: ["sh", "scripts/entrypoint.sh"]
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000",
+              "--proxy-headers", "--forwarded-allow-ips", "*"]
+    environment:
+      APP_ENV: production
+      DEMO_MODE: "false"
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-veridoc}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-veridoc}
+      REDIS_URL: redis://redis:6379/0
+      QUEUE_MODE: redis
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET to 48+ random bytes}
+      # Only the console's origin may call the API from a browser.
+      ALLOWED_ORIGINS: https://${APP_DOMAIN:?set APP_DOMAIN}
+      TRUSTED_HOSTS: ${APP_DOMAIN},api,localhost
+      STORAGE_PROVIDER: local
+      STORAGE_LOCAL_ROOT: /var/veridoc/storage
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-25}
+      RETENTION_DAYS: ${RETENTION_DAYS:-365}
+      # Swap in production providers when you have credentials for them.
+      OCR_PROVIDER: ${OCR_PROVIDER:-hybrid}
+      AIGC_PROVIDER: ${AIGC_PROVIDER:-demo_heuristic}
+      VERIFICATION_PROVIDER: ${VERIFICATION_PROVIDER:-demo}
+      MALWARE_SCANNER: ${MALWARE_SCANNER:-heuristic}
+    volumes:
+      # Shared with the worker: originals and derived artifacts.
+      - storage-data:/var/veridoc/storage
+    networks: [veridoc-internal]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 6
+      start_period: 40s
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-pypi.org}
+    command: ["python", "-m", "app.workers.worker"]
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-veridoc}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-veridoc}
+      REDIS_URL: redis://redis:6379/0
+      QUEUE_MODE: redis
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET to 48+ random bytes}
+      STORAGE_PROVIDER: local
+      STORAGE_LOCAL_ROOT: /var/veridoc/storage
+      OCR_PROVIDER: ${OCR_PROVIDER:-hybrid}
+      AIGC_PROVIDER: ${AIGC_PROVIDER:-demo_heuristic}
+      VERIFICATION_PROVIDER: ${VERIFICATION_PROVIDER:-demo}
+      MALWARE_SCANNER: ${MALWARE_SCANNER:-heuristic}
+    volumes:
+      - storage-data:/var/veridoc/storage
+    networks: [veridoc-internal]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    # Analysis is CPU-bound and single-threaded per document. Add capacity with
+    #   docker compose -f docker-compose.dokploy.yml up -d --scale worker=2
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_APP_NAME: ${APP_NAME:-VeriDoc}
+        NEXT_PUBLIC_DEMO_MODE: "false"
+    environment:
+      NODE_ENV: production
+      # Internal only — this is why the API needs no public route.
+      BACKEND_API_URL: http://api:8000/api
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-veridoc_session}
+    networks: [veridoc-internal, dokploy-network]
+    depends_on:
+      api: {condition: service_started}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.veridoc.rule=Host(`${APP_DOMAIN:?set APP_DOMAIN}`)
+      - traefik.http.routers.veridoc.entrypoints=websecure
+      - traefik.http.routers.veridoc.tls.certresolver=letsencrypt
+      - traefik.http.services.veridoc.loadbalancer.server.port=3000
+      # Uploads can be several MB; do not let a proxy buffer limit truncate them.
+      - traefik.http.middlewares.veridoc-body.buffering.maxRequestBodyBytes=52428800
+      - traefik.http.routers.veridoc.middlewares=veridoc-body
+    restart: unless-stopped
+
+  # ── Optional: expose the OpenAPI docs on their own hostname ───────────────
+  # The console does not need this. Enable it only if you want /docs reachable,
+  # and put an access policy in front of it — it is the whole API surface.
+  #
+  #   api-public:
+  #     image: traefik/whoami            # placeholder; see docs/DOKPLOY.md
+  #
+  # Add these labels to the `api` service instead of creating a new one:
+  #   - traefik.enable=true
+  #   - traefik.docker.network=dokploy-network
+  #   - traefik.http.routers.veridoc-api.rule=Host(`api.${APP_DOMAIN}`)
+  #   - traefik.http.routers.veridoc-api.entrypoints=websecure
+  #   - traefik.http.routers.veridoc-api.tls.certresolver=letsencrypt
+  #   - traefik.http.services.veridoc-api.loadbalancer.server.port=8000
+  # and add `dokploy-network` to the api service's networks.
+
+networks:
+  veridoc-internal:
+    driver: bridge
+  dokploy-network:
+    external: true
+
+volumes:
+  postgres-data:
+  redis-data:
+  storage-data:
