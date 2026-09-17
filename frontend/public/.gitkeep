@@ -1,0 +1,3 @@
+# Next.js serves this directory at the site root. Keep it tracked even while
+# empty: the runner stage does `COPY --from=builder /app/public ./public`, and a
+# fresh clone without this file makes that COPY fail ("/app/public: not found").
