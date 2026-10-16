@@ -131,7 +131,7 @@ export default async function DocumentsPage({
                         {document.page_count} page{document.page_count === 1 ? "" : "s"}
                       </span>
                     </TableCell>
-                    <TableCell className="text-xs">
+                    <TableCell className="min-w-[7.5rem] text-xs">
                       {document.classification_label ?? "—"}
                       {document.classification_confidence != null && (
                         <span className="block text-2xs text-muted-foreground">
@@ -139,7 +139,7 @@ export default async function DocumentsPage({
                         </span>
                       )}
                     </TableCell>
-                    <TableCell className="text-2xs">
+                    <TableCell className="whitespace-nowrap text-2xs">
                       {document.claim_id ? (
                         <Link className="text-primary hover:underline" href={`/claims/${document.claim_id}`}>
                           {document.claim_number}

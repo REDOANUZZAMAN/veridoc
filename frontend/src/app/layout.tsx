@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
 import { Toaster } from "sonner";
 
 import { ThemeProvider } from "@/components/layout/theme-provider";
@@ -21,15 +23,21 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f9fb" },
-    { media: "(prefers-color-scheme: dark)", color: "#12161f" },
+    { media: "(prefers-color-scheme: light)", color: "#f9f8fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#121019" },
   ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" suppressHydrationWarning>
-      <body className="font-sans">
+    /* Geist ships as local woff2 in the package, so the fonts are self-hosted:
+       no build-time or runtime request to a font CDN. */
+    <html
+      lang="en-GB"
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="font-sans text-sm">
         <ThemeProvider>
           {children}
           <Toaster

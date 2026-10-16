@@ -35,8 +35,8 @@ export function ConfidenceBar({ value, className }: { value: number; className?:
   const percentage = Math.round(Math.max(0, Math.min(1, value)) * 100);
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div className="h-1 w-14 overflow-hidden rounded-full bg-muted">
-        <div className="h-full rounded-full bg-foreground/45" style={{ width: `${percentage}%` }} />
+      <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
+        <div className="h-full rounded-full bg-foreground/40" style={{ width: `${percentage}%` }} />
       </div>
       <span className="tabular text-2xs text-muted-foreground">{percentage}%</span>
     </div>

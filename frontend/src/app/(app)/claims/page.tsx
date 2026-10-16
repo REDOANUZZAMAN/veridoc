@@ -101,7 +101,7 @@ export default async function ClaimsPage({
                     </Link>
                   </TableCell>
                   <TableCell className="text-xs">{claim.customer_name}</TableCell>
-                  <TableCell className="font-mono text-2xs">{claim.policy_number}</TableCell>
+                  <TableCell className="whitespace-nowrap font-mono text-2xs">{claim.policy_number}</TableCell>
                   <TableCell className="text-2xs">{humanise(claim.claim_type)}</TableCell>
                   <TableCell className="tabular whitespace-nowrap text-xs">
                     {formatMoney(claim.claimed_amount, claim.currency)}

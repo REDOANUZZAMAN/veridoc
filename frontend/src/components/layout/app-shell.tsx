@@ -30,7 +30,7 @@ export function AppShell({
     <TooltipProvider>
       <div className="flex min-h-screen">
         {/* Desktop navigation */}
-        <aside className="hidden w-60 shrink-0 border-r border-white/5 lg:block">
+        <aside className="hidden w-64 shrink-0 lg:block">
           <div className="sticky top-0 h-screen">
             <Sidebar permissions={user.permissions} appName={appName} version={version} />
           </div>
@@ -42,10 +42,10 @@ export function AppShell({
             <button
               type="button"
               aria-label="Close navigation"
-              className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-background/70 backdrop-blur-sm"
               onClick={() => setMobileOpen(false)}
             />
-            <div className="absolute inset-y-0 left-0 w-64 animate-slide-up shadow-2xl">
+            <div className="absolute inset-y-0 left-0 w-68 animate-slide-up shadow-overlay">
               <Sidebar
                 permissions={user.permissions}
                 appName={appName}
@@ -57,7 +57,7 @@ export function AppShell({
         )}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-40 flex h-14 items-center gap-2 border-b bg-background/85 px-4 backdrop-blur">
+          <header className="sticky top-0 z-40 flex h-15 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur-md md:px-6">
             <Button
               variant="ghost"
               size="icon-sm"
@@ -78,8 +78,8 @@ export function AppShell({
             <UserMenu user={user} />
           </header>
 
-          <main className="min-w-0 flex-1 px-4 py-5 md:px-6 lg:px-7">
-            <div className="mx-auto w-full max-w-[1560px] space-y-5">{children}</div>
+          <main className="min-w-0 flex-1 px-4 py-6 md:px-6 lg:px-8 lg:py-7">
+            <div className="mx-auto w-full max-w-[1560px] space-y-6">{children}</div>
           </main>
         </div>
       </div>

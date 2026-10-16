@@ -16,10 +16,10 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <header className={cn("flex flex-col gap-3 pb-1 md:flex-row md:items-start md:justify-between", className)}>
+    <header className={cn("flex flex-col gap-4 md:flex-row md:items-start md:justify-between", className)}>
       <div className="min-w-0 space-y-1">
         {breadcrumb && <div className="text-2xs text-muted-foreground">{breadcrumb}</div>}
-        <h1 className="truncate text-lg font-semibold tracking-tight">{title}</h1>
+        <h1 className="truncate text-xl font-semibold">{title}</h1>
         {description && (
           <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">{description}</p>
         )}
@@ -41,10 +41,14 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 px-6 py-14 text-center">
-      {icon && <div className="text-muted-foreground/70">{icon}</div>}
+    <div className="flex flex-col items-center justify-center gap-2.5 px-6 py-16 text-center">
+      {icon && (
+        <div className="mb-1 inline-flex size-11 items-center justify-center rounded-xl border bg-surface text-muted-foreground/80">
+          {icon}
+        </div>
+      )}
       <p className="text-sm font-medium">{title}</p>
-      {description && <p className="max-w-md text-xs text-muted-foreground">{description}</p>}
+      {description && <p className="max-w-md text-xs leading-relaxed text-muted-foreground">{description}</p>}
       {action && <div className="pt-2">{action}</div>}
     </div>
   );
@@ -62,7 +66,7 @@ export function KeyValue({
   return (
     <dl
       className={cn(
-        "grid gap-x-6 gap-y-3",
+        "grid gap-x-8 gap-y-4",
         columns === 1 && "grid-cols-1",
         columns === 2 && "grid-cols-1 sm:grid-cols-2",
         columns === 3 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
@@ -71,8 +75,8 @@ export function KeyValue({
     >
       {items.map((item) => (
         <div key={item.label} className="min-w-0 space-y-0.5">
-          <dt className="text-2xs uppercase tracking-wider text-muted-foreground">{item.label}</dt>
-          <dd className={cn("break-words text-xs", item.mono && "font-mono text-2xs")}>
+          <dt className="eyebrow font-medium">{item.label}</dt>
+          <dd className={cn("break-words text-xs leading-relaxed", item.mono && "font-mono text-2xs")}>
             {item.value ?? "—"}
           </dd>
           {item.hint && <p className="text-2xs text-muted-foreground/80">{item.hint}</p>}

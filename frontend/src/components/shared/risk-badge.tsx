@@ -23,13 +23,13 @@ export function RiskBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border font-medium",
+        "inline-flex items-center gap-2 whitespace-nowrap rounded-full border font-medium",
         tone.bg,
         tone.border,
         tone.text,
-        size === "sm" && "px-1.5 py-0.5 text-2xs",
-        size === "default" && "px-2 py-1 text-xs",
-        size === "lg" && "px-3 py-1.5 text-sm",
+        size === "sm" && "px-2 py-0.5 text-2xs",
+        size === "default" && "px-2.5 py-1 text-xs",
+        size === "lg" && "px-3.5 py-1.5 text-sm",
         className,
       )}
     >
@@ -46,11 +46,20 @@ export function RiskScoreMeter({ score, band }: { score: number; band: RiskBand 
   const tone = bandTone(band);
   return (
     <div className="space-y-1.5">
-      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+      <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-muted ring-1 ring-inset ring-border/60">
         <div
-          className={cn("h-full rounded-full transition-all", tone.dot)}
+          className={cn("h-full rounded-full transition-all duration-500", tone.dot)}
           style={{ width: `${Math.max(2, Math.min(100, score))}%` }}
         />
+        {/* Band thresholds sit on the track so the score reads against them. */}
+        {[40, 75].map((threshold) => (
+          <span
+            key={threshold}
+            aria-hidden
+            className="absolute top-0 h-full w-px bg-card/70"
+            style={{ left: `${threshold}%` }}
+          />
+        ))}
       </div>
       <div className="flex justify-between text-2xs text-muted-foreground">
         <span>0 · Low Concern</span>

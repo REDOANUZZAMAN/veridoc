@@ -5,16 +5,17 @@
  * in charts they are encoded as a validated **ordinal ramp** - one hue, light to
  * dark - rather than the green/amber/red triad used on badges. That is a
  * deliberate accessibility decision: a green-to-red triad fails deuteranopia
- * separation badly (measured CVD ΔE 4.2 between the green and the red, against a
- * floor of 8), which would make the two colours that matter most in this product
- * indistinguishable for a common form of colour blindness.
+ * separation far more easily than a single-hue ramp, which would make the two
+ * colours that matter most in this product hard to tell apart for a common form
+ * of colour blindness.
  *
  * The semantic triad is still used on badges and chips, where it is always
  * accompanied by the band's name - colour never carries the meaning alone.
  *
- * Both ramps below pass the full ordinal validation against this product's own
- * chart surfaces (#ffffff light, #171c27 dark): monotone lightness, adjacent
- * ΔL >= 0.06, light end clear of the surface, single hue.
+ * Both ramps below are the product's iris accent, stepped and then validated
+ * against this product's own chart surfaces (#ffffff light, #191622 dark):
+ * monotone lightness, adjacent OKLCH ΔL >= 0.06, single hue (spread <= 9°), and a
+ * light end that clears the surface (2.12:1 light, 2.35:1 dark).
  */
 export interface ChartTheme {
   surface: string;
@@ -32,26 +33,26 @@ export interface ChartTheme {
 
 export const LIGHT_THEME: ChartTheme = {
   surface: "#ffffff",
-  grid: "#e6e9ee",
-  axis: "#c8cdd6",
-  ink: "#1c2330",
-  inkMuted: "#6b7280",
-  primary: "#2a78d6",
-  bands: ["#86b6ef", "#2a78d6", "#104281"],
+  grid: "#e8e6ef",
+  axis: "#c7c3d5",
+  ink: "#1a1726",
+  inkMuted: "#6a6581",
+  primary: "#5e31d8",
+  bands: ["#bba7f1", "#683eda", "#381a89"],
   tooltipBg: "#ffffff",
-  tooltipBorder: "#d8dde5",
+  tooltipBorder: "#dddae7",
 };
 
 export const DARK_THEME: ChartTheme = {
-  surface: "#171c27",
-  grid: "#242c3a",
-  axis: "#333c4d",
-  ink: "#e6eaf1",
-  inkMuted: "#9aa3b2",
-  primary: "#3987e5",
-  bands: ["#9ec5f4", "#3987e5", "#184f95"],
-  tooltipBg: "#1b2130",
-  tooltipBorder: "#2c3547",
+  surface: "#191622",
+  grid: "#2c2938",
+  axis: "#464257",
+  ink: "#ebeaf1",
+  inkMuted: "#9c97af",
+  primary: "#a582f7",
+  bands: ["#c3affd", "#9e7cf4", "#5e2bd4"],
+  tooltipBg: "#1d1a28",
+  tooltipBorder: "#383546",
 };
 
 export const BAND_ORDER = ["low_concern", "review_recommended", "high_concern"] as const;
