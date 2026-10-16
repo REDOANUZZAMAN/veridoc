@@ -140,7 +140,7 @@ services:
     environment:
       NODE_ENV: production
       # Internal only — this is why the API needs no public route.
-      BACKEND_API_URL: http://api:8000/api
+      BACKEND_API_URL: http://${COMPOSE_PROJECT_NAME:-veridoc}-api:8000/api
       SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-veridoc_session}
     networks: [veridoc-internal, dokploy-network]
     depends_on:
