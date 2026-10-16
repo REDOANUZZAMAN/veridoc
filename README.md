@@ -57,7 +57,7 @@ docker compose exec api python -m app.db.seed --reset
 | PostgreSQL | `localhost:55432` | `veridoc` / `veridoc` |
 | Redis | `localhost:63799` | |
 
-Sign in with any demo account — password **`Demo!2026`**:
+Sign in with any demo account, using the password you set as `SEED_PASSWORD` in `.env`:
 
 | Account | Role | What it can do |
 |---|---|---|
@@ -329,7 +329,7 @@ Interactive documentation at `/docs`; the OpenAPI schema at `/openapi.json`.
 # authenticate
 TOKEN=$(curl -s localhost:8088/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"investigator@veridoc.example","password":"Demo!2026"}' | jq -r .access_token)
+  -d "{\"email\":\"investigator@veridoc.example\",\"password\":\"$SEED_PASSWORD\"}" | jq -r .access_token)
 AUTH="Authorization: Bearer $TOKEN"
 
 # create a claim
