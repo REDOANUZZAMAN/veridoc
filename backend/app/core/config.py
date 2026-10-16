@@ -81,6 +81,8 @@ class Settings(BaseSettings):
     aigc_provider: Literal["demo_heuristic", "remote_http"] = "demo_heuristic"
     aigc_remote_url: str | None = None
     aigc_remote_api_key: str | None = None
+    # Covers a GPU cold start on a scale-to-zero detector (~20-60 s).
+    aigc_remote_timeout: float = 120.0
     verification_provider: Literal["demo", "remote_http"] = "demo"
     verification_remote_url: str | None = None
     verification_remote_api_key: str | None = None

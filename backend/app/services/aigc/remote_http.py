@@ -41,10 +41,11 @@ class RemoteHttpAigcProvider(AigcProvider):
     is_demo = False
     disclaimer = ""
 
-    def __init__(self, url: str | None = None, api_key: str | None = None, timeout: float = 30.0):
+    def __init__(self, url: str | None = None, api_key: str | None = None,
+                 timeout: float | None = None):
         self.url = url or settings.aigc_remote_url
         self.api_key = api_key or settings.aigc_remote_api_key
-        self.timeout = timeout
+        self.timeout = timeout if timeout is not None else settings.aigc_remote_timeout
 
     def available(self) -> tuple[bool, str]:
         if not self.url:

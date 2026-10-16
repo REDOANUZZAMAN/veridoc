@@ -77,6 +77,9 @@ services:
       # Swap in production providers when you have credentials for them.
       OCR_PROVIDER: ${OCR_PROVIDER:-hybrid}
       AIGC_PROVIDER: ${AIGC_PROVIDER:-demo_heuristic}
+      AIGC_REMOTE_URL: ${AIGC_REMOTE_URL:-}
+      AIGC_REMOTE_API_KEY: ${AIGC_REMOTE_API_KEY:-}
+      AIGC_REMOTE_TIMEOUT: ${AIGC_REMOTE_TIMEOUT:-120}
       VERIFICATION_PROVIDER: ${VERIFICATION_PROVIDER:-demo}
       MALWARE_SCANNER: ${MALWARE_SCANNER:-heuristic}
     volumes:
@@ -112,6 +115,9 @@ services:
       STORAGE_LOCAL_ROOT: /var/veridoc/storage
       OCR_PROVIDER: ${OCR_PROVIDER:-hybrid}
       AIGC_PROVIDER: ${AIGC_PROVIDER:-demo_heuristic}
+      AIGC_REMOTE_URL: ${AIGC_REMOTE_URL:-}
+      AIGC_REMOTE_API_KEY: ${AIGC_REMOTE_API_KEY:-}
+      AIGC_REMOTE_TIMEOUT: ${AIGC_REMOTE_TIMEOUT:-120}
       VERIFICATION_PROVIDER: ${VERIFICATION_PROVIDER:-demo}
       MALWARE_SCANNER: ${MALWARE_SCANNER:-heuristic}
     volumes:
