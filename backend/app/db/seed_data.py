@@ -32,7 +32,7 @@ def role_rows() -> list[dict]:
 
 
 DEMO_USERS = [
-    {"email": "admin@veridoc.example", "full_name": "Rhea Kapoor", "role": Role.ADMIN,
+    {"email": "admin@veridoc.example", "full_name": "Redoanuzzaman", "role": Role.ADMIN,
      "job_title": "Platform Administrator", "team": "Financial Crime Technology"},
     {"email": "investigator@veridoc.example", "full_name": "Daniel Osei",
      "role": Role.FRAUD_INVESTIGATOR, "job_title": "Senior Fraud Investigator",
